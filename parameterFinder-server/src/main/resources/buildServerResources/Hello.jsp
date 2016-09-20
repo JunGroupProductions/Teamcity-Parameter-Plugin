@@ -1,49 +1,29 @@
 <html>
     <head>
-        <script language="JavaScript">
-            window.onload = loadParameters;
+        <script>
+            window.addEventListener('load', function () {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/plugins/parameterFinder/parameters.xml');
+                xhr.addEventListener('load', function () {
 
-            function loadParameters()
-            {
-                var xmlDoc=loadXMLDoc("/plugins/parameterFinder/parameters.xml");
-                var x = xmlDoc.getElementsByTagName("parameter");
+                    // Iterate over parameter elements
+                    Array.from(this.responseXML.getElementsByTagName('parameter')).forEach(function (parameter) {
 
-                for (i=0;i<x.length;i++) {
-                    document.getElementById('params').innerHTML += "Tool: "+x[i].getElementsByTagName("tool")[0].childNodes[0].nodeValue;
-                    document.getElementById('params').innerHTML += "<br>";
-                    document.getElementById('params').innerHTML += "Path: "+x[i].getElementsByTagName("location")[0].childNodes[0].nodeValue;
-                    document.getElementById('params').innerHTML += "<br>";
-                    document.getElementById('params').innerHTML += "File: "+x[i].getElementsByTagName("file")[0].childNodes[0].nodeValue;
-                    document.getElementById('params').innerHTML += "<br>";
-                    document.getElementById('params').innerHTML += "Command: "+x[i].getElementsByTagName("command")[0].childNodes[0].nodeValue;
-                    document.getElementById('params').innerHTML += "<br>";
-                    document.getElementById('params').innerHTML += "Regex: "+x[i].getElementsByTagName("regex")[0].childNodes[0].nodeValue;
-                    document.getElementById('params').innerHTML += "<br><br>";
-                }
-            }
+                        // Iterate over parameter children
+                        Array.from(parameter.children).forEach(function (child) {
+                            document.getElementById('params').innerHTML += child.nodeName + ': ' + child.innerHTML + '<br>';
+                        });
 
-            function loadXMLDoc(filename)
-            {
-                if (window.XMLHttpRequest)
-                {
-                    xhttp=new XMLHttpRequest();
-                }
-                else // code for IE5 and IE6
-                {
-                    xhttp=new ActiveXObject("Microsoft.XMLHTTP");
-                }
-                xhttp.open("GET",filename,false);
-                xhttp.send();
-                return xhttp.responseXML;
-            }
-
+                        document.getElementById('params').innerHTML += '<br>';
+                    });
+                });
+                xhr.send();
+            });
         </script>
     </head>
     <body>
         <div id="main">
-            <div id="params" style="padding:30px;">
-
-            </div>
+            <div id="params" style="padding:30px;"></div>
         </div>
     </body>
 </html>
