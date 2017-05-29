@@ -11,17 +11,15 @@ import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 public class AppAgent extends AgentLifeCycleAdapter {
 
     private StringBuilder s = null;
-    Map<String, String> values = new HashMap<String, String>();
+    Map<String, String> environmentVariables = new HashMap<String, String>();
+    Map<String, String> configurationParameters = new HashMap<String, String>();
 
     public AppAgent(@NotNull EventDispatcher<AgentLifeCycleListener> dispatcher) {
         s = new StringBuilder();
@@ -37,48 +35,67 @@ public class AppAgent extends AgentLifeCycleAdapter {
             doc.getDocumentElement().normalize();
             NodeList nList = doc.getElementsByTagName("parameter");
 
-            ArrayList<String> locations = new ArrayList<String>();
-
             for (int i = 0; i < nList.getLength(); i++) {
                 Node nNode = nList.item(i);
-                locations.clear();
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
                     String toolName = (eElement.getElementsByTagName("tool").item(0).getTextContent());
-                    NodeList list = eElement.getElementsByTagName("location");
 
-                    for (int j = 0; j < list.getLength(); j++) {
-                        String location = list.item(j).getTextContent();
-
-                        if (location != null && location.compareTo("") != 0 && location.compareTo(" ") != 0 && location.compareTo("null") != 0) {
-                            location = location.replaceAll("[/\\\\]+", Matcher.quoteReplacement(System.getProperty("file.separator")));
-                        }
-
-                        locations.add(location);
-                    }
-
-			        NodeList files = eElement.getElementsByTagName("file");
-                    Node fileNode = files == null ? null : files.item(0);
-                    String file = fileNode == null ? null : fileNode.getTextContent();
                     String command = eElement.getElementsByTagName("command").item(0).getTextContent();
                     String regex = eElement.getElementsByTagName("regex").item(0).getTextContent();
 
-                    new ParameterFinder(toolName, regex, locations, command, file, this);
+                    // The `list` element is optional; value defaults to false if not present or if any value besides true
+                    NodeList optionalElements = eElement.getElementsByTagName("list");
+                    Node optionalNode = optionalElements == null ? null : optionalElements.item(0);
+                    String optionalString = optionalNode == null ? null : optionalNode.getTextContent();
+                    boolean isList = "true".equals( optionalString );
+
+                    // The `name` element is optional; value defaults to toolName if not present
+                    optionalElements = eElement.getElementsByTagName("name");
+                    optionalNode = optionalElements == null ? null : optionalElements.item(0);
+                    String nameFormat = optionalNode == null ? toolName : optionalNode.getTextContent();
+
+                    // The `value` element is optional; value defaults to "$1" if not present
+                    optionalElements = eElement.getElementsByTagName("value");
+                    optionalNode = optionalElements == null ? null : optionalElements.item(0);
+                    String valueFormat = optionalNode == null ? "$1" : optionalNode.getTextContent();
+
+                    // The `type` element is optional; value defaults to "env" if not present
+                    optionalElements = eElement.getElementsByTagName("type");
+                    optionalNode = optionalElements == null ? null : optionalElements.item(0);
+                    String type = optionalNode == null ? "env" : optionalNode.getTextContent();
+
+                    Map<String, String> parameters = environmentVariables;
+                    if ( "config".equals( type ) ) {
+                        parameters = configurationParameters;
+                    }
+
+                    buildLogString("\n\t\tTOOL: " + toolName + "\n");
+                    new ParameterFinder(nameFormat, valueFormat, regex, command, parameters, isList, this);
                 }
             }
         } catch (Exception e) {
-            buildLogString(e.toString());
+            buildLogString("\nParameterFinder: " + e.toString());
+            buildLogString("\nParameterFinder: " + e.getStackTrace()[0].toString());
         } finally {
             log(s);
         }
 
         BuildAgentConfiguration conf = agent.getConfiguration();
-        Iterator it = values.entrySet().iterator();
+        Iterator it = environmentVariables.entrySet().iterator();
 
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             conf.addEnvironmentVariable(pair.getKey().toString(), pair.getValue().toString());
+            it.remove();
+        }
+
+        it = configurationParameters.entrySet().iterator();
+
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            conf.addConfigurationParameter(pair.getKey().toString(), pair.getValue().toString());
             it.remove();
         }
     }
