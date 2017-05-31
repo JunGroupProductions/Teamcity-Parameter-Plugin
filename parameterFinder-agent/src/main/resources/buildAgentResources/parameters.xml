@@ -1,107 +1,86 @@
 <parameterList>
     <parameter>
         <tool>Xcode_Build_CLI</tool>
-	    <file></file>
-	    <location></location>
         <command>xcodebuild -version</command>
         <regex>Xcode\s*([0-9\.]+)</regex>
     </parameter>
     <parameter>
         <tool>Hardware_iOS_Device_Id</tool>
-	    <file></file>
-	    <location></location>
         <command>instruments -s devices</command>
         <regex>QA.*?\[([a-f0-9]+)\]</regex>
     </parameter>
     <parameter>
         <tool>Hardware_iOS_Version</tool>
-        <file></file>
-        <location></location>
         <command>instruments -s devices</command>
         <regex>QA.*?\((\S*)\)</regex>
     </parameter>
     <parameter>
         <tool>Hardware_iOS_Device_Name</tool>
-        <file></file>
-        <location></location>
         <command>instruments -s devices</command>
         <regex>(QA.*?\(\d+(\.\d+){0,2}\))</regex>
     </parameter>
     <parameter>
         <tool>Heroku</tool>
-	    <file></file>
-	    <location></location>
         <command>heroku --version</command>
         <regex>heroku-toolbelt.([0-9]+.[0-9]+.[0-9]+)</regex>
     </parameter>
     <parameter>
         <tool>DOCKER</tool>
-	    <file></file>
-	    <location></location>
         <command>docker version</command>
         <regex>Version:\s*(\S+)\s*</regex>
     </parameter>
     <parameter>
         <tool>ANDROID_SERIAL_NUMBER</tool>
-	    <file></file>
-	    <location></location>
         <command>adb shell getprop ro.serialno</command>
         <regex>([^*]+)$</regex>
     </parameter>
     <parameter>
         <tool>ANDROID_BRAND</tool>
-	    <file></file>
-	    <location></location>
         <command>adb shell getprop ro.product.model</command>
         <regex>(.*[^*\s])$</regex>
     </parameter>
     <parameter>
         <tool>ANDROID_API_LEVEL</tool>
-	    <file></file>
-	    <location></location>
         <command>adb shell getprop ro.build.version.sdk</command>
         <regex>(.*[^*\s])$</regex>
     </parameter>
     <parameter>
         <tool>ANDROID_VERSION</tool>
-	    <file></file>
-	    <location></location>
         <command>adb shell getprop ro.build.version.release</command>
         <regex>(.*[^*\s])$</regex>
     </parameter>
     <parameter>
         <tool>ANDROID_MANUFACTURER</tool>
-	    <file></file>
-	    <location></location>
         <command>adb shell getprop ro.product.manufacturer</command>
         <regex>(.*[^*\s])$</regex>
     </parameter>
     <parameter>
         <tool>POSTGRESQL_VERSION</tool>
-        <file></file>
-        <location></location>
         <command>psql -V</command>
         <regex>psql\s*\(PostgreSQL\)\s*([0-9]+.[0-9]+.[0-9]+)</regex>
     </parameter>
     <parameter> 
         <tool>UNITY_VERSION</tool> 
-        <file></file> 
-        <location></location> 
         <command>defaults read /Applications/Unity/Unity.app/Contents/Info.plist CFBundleShortVersionString</command> 
         <regex>Unity version (\S*)</regex>
     </parameter>
     <parameter>
         <tool>MYSQL</tool>
-	    <file></file>
-	    <location></location>
         <command>mysql --version</command>
         <regex>(\d+\.\d+(\.\d+)?),</regex>
     </parameter>
     <parameter> 
         <tool>TSHARK</tool> 
-        <file></file> 
-        <location></location> 
         <command>tshark -v</command> 
         <regex>TShark \(Wireshark\)\s+(\d+\.\d+(\.\d+)?)</regex>
+    </parameter>
+    <parameter> 
+        <tool>iOS Simulator</tool> 
+        <command>instruments -s devices</command> 
+        <regex>\((\d+\.?\d*\.?\d*)\)\s+\[[A-Z0-9-]+\]\s+\(Simulator\)</regex>
+        <type>config</type>
+        <list>true</list>
+        <name>tools.xcode.sdk.iphonesimulator.$1</name>
+        <value>iOS $1</value>
     </parameter>
 </parameterList>
