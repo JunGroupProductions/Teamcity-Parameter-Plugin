@@ -1,5 +1,10 @@
 <parameterList>
     <parameter>
+        <tool>PYTHON</tool>
+        <command>python --version</command>
+        <regex>Python: (.*)</regex>
+    </parameter>
+    <parameter>
         <tool>SOURCECLEAR</tool>
         <command>srcclr -v</command>
         <regex>Version: (.*)</regex>
