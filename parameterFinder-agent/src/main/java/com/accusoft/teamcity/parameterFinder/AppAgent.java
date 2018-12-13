@@ -66,13 +66,19 @@ public class AppAgent extends AgentLifeCycleAdapter {
                     optionalNode = optionalElements == null ? null : optionalElements.item(0);
                     String type = optionalNode == null ? "env" : optionalNode.getTextContent();
 
+                    // The `use_std_err` element is optional; value defaults to "false" if not present
+                    optionalElements = eElement.getElementsByTagName("use_std_err");
+                    optionalNode = optionalElements == null ? null : optionalElements.item(0);
+                    optionalString = optionalNode == null ? null : optionalNode.getTextContent();
+                    boolean useStdErr = "true".equals( optionalString );
+
                     Map<String, String> parameters = environmentVariables;
                     if ( "config".equals( type ) ) {
                         parameters = configurationParameters;
                     }
 
                     buildLogString("\n\t\tTOOL: " + toolName + "\n");
-                    new ParameterFinder(nameFormat, valueFormat, regex, command, parameters, isList, this);
+                    new ParameterFinder(nameFormat, valueFormat, regex, command, parameters, isList, this, useStdErr);
                 }
             }
         } catch (Exception e) {

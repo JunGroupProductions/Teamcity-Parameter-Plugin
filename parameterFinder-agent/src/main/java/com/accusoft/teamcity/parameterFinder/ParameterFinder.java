@@ -12,9 +12,11 @@ public class ParameterFinder {
     String command;
     String regex;
     boolean isList;
+    boolean useStdErr;
     Map<String, String> parameters;
 
-    public ParameterFinder(String nameFormat, String valueFormat, String regex, String command, Map<String, String> parameters, boolean isList, AppAgent appAgent) {
+    public ParameterFinder(String nameFormat, String valueFormat, String regex, String command,
+                           Map<String, String> parameters, boolean isList, AppAgent appAgent, boolean useStdErr) {
         this.appAgent = appAgent;
         this.nameFormat = nameFormat;
         this.valueFormat = valueFormat;
@@ -22,6 +24,7 @@ public class ParameterFinder {
         this.regex = regex;
         this.parameters = parameters;
         this.isList = isList;
+        this.useStdErr = useStdErr;
         runCommand();
     }
 
@@ -32,7 +35,10 @@ public class ParameterFinder {
             BufferedReader stdInput;
 
             Process process = Runtime.getRuntime().exec(command);
-            stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            InputStream inputStream = useStdErr ? process.getErrorStream() : process.getInputStream();
+
+            stdInput = new BufferedReader(new InputStreamReader(inputStream));
             while ((line = stdInput.readLine()) != null) {
                 output.append(line);
             }

@@ -2,7 +2,13 @@
     <parameter>
         <tool>PYTHON</tool>
         <command>python --version</command>
-        <regex>Python: (.*)</regex>
+        <regex>Python (.*)</regex>
+        <use_std_err>true</use_std_err>
+    </parameter>
+    <parameter>
+        <tool>PYTHON3</tool>
+        <command>python3 --version</command>
+        <regex>Python (.*)</regex>
     </parameter>
     <parameter>
         <tool>SOURCECLEAR</tool>
