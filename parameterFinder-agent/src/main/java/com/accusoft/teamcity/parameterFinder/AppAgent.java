@@ -94,6 +94,7 @@ public class AppAgent extends AgentLifeCycleAdapter {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             conf.addEnvironmentVariable(pair.getKey().toString(), pair.getValue().toString());
+            Loggers.AGENT.info( "env." + pair.getKey().toString() + " = " + pair.getValue().toString() );
             it.remove();
         }
 
@@ -102,6 +103,7 @@ public class AppAgent extends AgentLifeCycleAdapter {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             conf.addConfigurationParameter(pair.getKey().toString(), pair.getValue().toString());
+            Loggers.AGENT.info( pair.getKey().toString() + " = " + pair.getValue().toString() );
             it.remove();
         }
     }
